@@ -40,9 +40,9 @@ public class SeqAlign {
 					int left = alignMatrix[x][y-1] - gap;
 					int diag = alignMatrix[x-1][y-1] + mismatch;
 					alignMatrix[x][y] = Math.max(Math.max(up, left), diag);
-					if (alignMatrix[x][y] == left) {traceMatrix[x-1][y-1] = "left";}
+					if (alignMatrix[x][y] == diag) {traceMatrix[x-1][y-1] = "diag";}
 					else if (alignMatrix[x][y] == up) {traceMatrix[x-1][y-1] = "up--";}
-					else {traceMatrix[x-1][y-1] = "diag";}
+					else if (alignMatrix[x][y] == left) {traceMatrix[x-1][y-1] = "left";}
 				}
 			}
 		}
@@ -82,14 +82,16 @@ public class SeqAlign {
 		}
 		
 		// If j or k == 0, add gap
-		while (j > 0) {
-			resA = resA + "-"; 
+		while (j >= 0 && k < 0) {
+			resA = resA + seqA.charAt(j);
+			resB = resB + "-"; 
 			j--;
 			gCount++; 
 			System.out.println("gap");
 			}
-		while (k > 0) {
-			resB = resB + "-"; 
+		while (k >= 0 && j < 0) {
+			resB = resB + seqB.charAt(k); 
+			resA = resA + "-";
 			k--;
 			gCount++; 
 			System.out.println("gap");
@@ -135,7 +137,7 @@ public class SeqAlign {
 	}
 	
 	public static void main (String[] args) {
-		SeqAlign test = new SeqAlign("GCATGCU", "GATTACA");
+		SeqAlign test = new SeqAlign("GCATGCU", "CATAGAA");
 		test.align();
 		test.printMatrix();
 		System.out.println();
