@@ -1,5 +1,3 @@
-package msa;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -8,7 +6,7 @@ public class MultipleSeq {
 	double[][] similarityMatrix;
 	ArrayList<Integer> order = new ArrayList<Integer>();
 	ArrayList<String> seqs;
-	ArrayList<String> alignedSeqs;
+	ArrayList<String> alignedSeqs = new ArrayList<String>();
 	
 	public MultipleSeq() {}
 	
@@ -28,7 +26,22 @@ public class MultipleSeq {
 	}
 	
 	public void msAlign() {
-		
+		SeqAlign sequencePair = null;
+		for (int i = 0; i < order.size(); i++) {
+			if (i == 0) {
+				sequencePair = new SeqAlign(seqs.get(order.get(i)), seqs.get(order.get(i+1)));
+				sequencePair.align();
+				alignedSeqs.add(sequencePair.resA);
+				alignedSeqs.add(sequencePair.resB);
+				System.out.println("Sequence " + "0" + " and Sequence " + "1" + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
+				}
+			else {
+				if (i == order.size()-1) {return;}
+				sequencePair.singleAlign(seqs.get(order.get(i+1)));
+				alignedSeqs.add(sequencePair.resA);
+			}
+		}
+		//SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
 	}
 	
 	public void alignOrder() {
@@ -80,15 +93,18 @@ public class MultipleSeq {
 	
 	public static void main (String[] args) {
 		ArrayList<String> test = new ArrayList<String>();
-		test.add("GCATGCU");
-		test.add("GATTACA");
-		test.add("CGTAGCA");
-		test.add("CATAGAA");
+		test.add("CATGCGAGTAGTAG");
+		test.add("CATGGTAGTAG");
+		test.add("CCTGGAGTACGTAG");
+		test.add("CATGAGCGTAG");
 		MultipleSeq mulTest = new MultipleSeq();
 		mulTest.createSimilarityMatrix(test);
 		mulTest.printSimMatrix();
 		mulTest.alignOrder();
 		System.out.println("\n" + mulTest.order);
+		mulTest.msAlign();
+		System.out.println(mulTest.alignedSeqs.size());
+		System.out.println(mulTest.alignedSeqs);
 	}
 	
 }
