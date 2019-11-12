@@ -1,5 +1,3 @@
-package msa;
-
 public class SeqAlign {
 	
 	int[][] alignMatrix;
@@ -9,10 +7,9 @@ public class SeqAlign {
 	String resA = "";
 	String resB = "";
 	double identity;
-	int match = 1;
-	int mismatch = -2;
-	int indel = -1;
-	int gap = 1;
+	int match = 5;
+	int mismatch = -1;
+	int gap = -2;
 
 	public SeqAlign(String seqA, String seqB) {
 		this.seqA = seqA;
@@ -22,8 +19,8 @@ public class SeqAlign {
 		alignMatrix = new int[seqA.length()+1][seqB.length()+1];
 		alignMatrix[0][0] = 0;
 		traceMatrix = new String[seqA.length()+1][seqB.length()+1];
-		for (int i = 1; i <= seqA.length(); i++) {alignMatrix[i][0] = alignMatrix[i-1][0] - gap;}
-		for (int j = 1; j <= seqB.length(); j++) {alignMatrix[0][j] = alignMatrix[0][j-1] - gap;}
+		for (int i = 1; i <= seqA.length(); i++) {alignMatrix[i][0] = alignMatrix[i-1][0] + gap;}
+		for (int j = 1; j <= seqB.length(); j++) {alignMatrix[0][j] = alignMatrix[0][j-1] + gap;}
 	}
 	
 	
@@ -32,12 +29,12 @@ public class SeqAlign {
 		for (int x = 1; x <= seqA.length(); x++) {
 			for (int y = 1; y <= seqB.length(); y++) {
 				if (seqA.charAt(x - 1) == seqB.charAt(y - 1)) {
-					alignMatrix[x][y] = alignMatrix[x-1][y-1];
+					alignMatrix[x][y] = alignMatrix[x-1][y-1] + match;
 					traceMatrix[x-1][y-1] = "dia=";
 				}
 				else {
-					int up = alignMatrix[x-1][y] - gap;
-					int left = alignMatrix[x][y-1] - gap;
+					int up = alignMatrix[x-1][y] + gap;
+					int left = alignMatrix[x][y-1] + gap;
 					int diag = alignMatrix[x-1][y-1] + mismatch;
 					alignMatrix[x][y] = Math.max(Math.max(up, left), diag);
 					if (alignMatrix[x][y] == diag) {traceMatrix[x-1][y-1] = "diag";}
@@ -110,6 +107,99 @@ public class SeqAlign {
 		
 	}
 	
+	public void singleAlign(String seq) {
+		seqB = resB;
+		alignMatrix = new int[seq.length()+1][seqB.length()+1];
+		alignMatrix[0][0] = 0;
+		traceMatrix = new String[seq.length()+1][seqB.length()+1];
+		for (int i = 1; i <= seq.length(); i++) {alignMatrix[i][0] = alignMatrix[i-1][0] + gap;}
+		for (int y = 1; y <= seqB.length(); y++) {alignMatrix[0][y] = alignMatrix[0][y-1] + gap;}
+		// Filling out the alignment matrix
+		for (int x = 1; x <= seq.length(); x++) {
+			for (int y = 1; y <= seqB.length(); y++) {
+				if (seq.charAt(x - 1) == seqB.charAt(y - 1)) {
+					alignMatrix[x][y] = alignMatrix[x-1][y-1];
+					traceMatrix[x-1][y-1] = "dia=";
+				}
+				else {
+					//int up = alignMatrix[x-1][y] - gap;
+					int left = alignMatrix[x][y-1] + gap;
+					int diag = alignMatrix[x-1][y-1] + mismatch;
+					alignMatrix[x][y] = Math.max(left, diag);
+					if (alignMatrix[x][y] == diag) {traceMatrix[x-1][y-1] = "diag";}
+					else if (alignMatrix[x][y] == left) {traceMatrix[x-1][y-1] = "left";}
+					else {traceMatrix[x-1][y-1] = "diag";}
+				}
+			}
+		}
+		
+		// Tracing back
+		int j = seq.length()-1;
+		int k = seqB.length()-1;
+		int count = 0;
+		int gCount = 0;
+		resA = "";
+		
+		while (j >= 0 && k >= 0) {
+			if (traceMatrix[j][k] == "left") {
+				resA = resA + "-";		
+				//resB = resB + seqB.charAt(k);
+				k--;
+				gCount++;
+			}
+			else if (traceMatrix[j][k] == "up--") {
+				resA = resA + seq.charAt(j);
+				//resB = resB + "-";
+				j--;
+				gCount++;
+			}
+			else if (traceMatrix[j][k] == "diag") {
+				//resB = resB + seqB.charAt(k);
+				resA = resA + seq.charAt(j);
+				j--;
+				k--;
+			}
+			else if (traceMatrix[j][k] == "dia=") {
+				//resB = resB + seqB.charAt(k);
+				resA = resA + seq.charAt(j);
+				j--;
+				k--;
+				count++;
+			}
+		}
+		
+		// If j or k == 0, add gap
+		while (j >= 0 && k < 0) {
+			resA = resA + seq.charAt(j);
+			//resB = resB + "-"; 
+			j--;
+			gCount++; 
+			}
+		while (k >= 0 && j < 0) {
+			//resB = resB + seqB.charAt(k); 
+			//resA = resA + "-";
+			k--;
+			gCount++; 
+			}	
+		
+		while (resA.length() < resB.length()) {
+			resA = resA + "-";
+		}
+		
+		// Flip the result
+		resA = reverse(resA);
+		//resB = reverse(resB);
+		
+		identity = (double)count/resA.length();
+		
+		System.out.println(resA);
+		//System.out.println();
+		//System.out.println(resB);
+		//System.out.println("\nidentity: " + identity);
+		//System.out.println("gaps: " + gCount + "\n");
+		
+	}
+	
 	public void printTrace() {
 		for (int i = 0; i < traceMatrix.length-1; i++) {
 		    for (int j = 0; j < traceMatrix[i].length-1; j++) {
@@ -125,6 +215,7 @@ public class SeqAlign {
 		    	if (alignMatrix[i][j] < 0) {
 		    		System.out.print(alignMatrix[i][j] + " ");
 		    	}
+		    	else if (alignMatrix[i][j] >= 10) {System.out.print(alignMatrix[i][j] + " ");}
 		    	else {System.out.print(" " + alignMatrix[i][j] + " ");}
 		        
 		    }
@@ -142,7 +233,11 @@ public class SeqAlign {
 		test.printMatrix();
 		System.out.println();
 		test.printTrace();
-		//test.align();
+//		System.out.println("hi");
+//		test.singleAlign("CGTAGCA");
+//		test.printMatrix();
+//		System.out.println();
+//		test.printTrace();
 	}
 	
 }
