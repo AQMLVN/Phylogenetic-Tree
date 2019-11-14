@@ -54,12 +54,28 @@ public class PhyloTree {
 			result.add(c);
 		}
 		System.out.println(result);
+		System.out.println(result.size());
 		while (result.size() > 2) {
+			System.out.println("LOOP!!!");
 			double val = getMinValue(distMatrix);
 			System.out.println("val = " + val);
-			result.get(x).merge(result.get(y));
-			result.get(x).setHeight(val/2);
-			result.remove(y);
+			if (result.get(x).checkMerge()) {
+				result.get(y).setHeight(val/2);
+				result.get(x).merge(result.get(y));
+				//result.get(x).setHeight(val/2);
+				result.remove(y);
+			}
+			else if (result.get(y).checkMerge()){
+				result.get(x).setHeight(val/2);
+				result.get(y).merge(result.get(x));
+				//result.get(y).setHeight(val/2);
+				result.remove(x);
+			}
+			else {
+				result.get(x).merge(result.get(y));
+				result.get(x).setHeight(val/2);
+				result.remove(y);
+			}
 			// reconstruct matrix
 			double[][] newDist = new double[distMatrix.length-1][distMatrix.length-1];
 			int countx = 0;
@@ -97,16 +113,34 @@ public class PhyloTree {
 				if (i < y) {value = (distMatrix[i][x] + distMatrix[i][y])/2;}
 				if (i >= y) {value = (distMatrix[i+1][x] + distMatrix[i+1][y])/2;}
 				if (i == x) {value = 0;}
-				System.out.println("i = " + i);
-				System.out.println("y = " + y);
-				System.out.println("x = " + x);
-				System.out.println("value = " + value);
 				newDist[x][i] = value;
 				newDist[i][x] = value;
 			}
 			distMatrix = newDist;
 			printDistMatrix();
 		}
+		double val = getMinValue(distMatrix);
+
+		
+		if (result.get(x).checkMerge()) {
+			result.get(y).setHeight(val/2);
+			result.get(x).merge(result.get(y));
+			result.get(x).setHeight(val/2);
+			result.remove(y);
+		}
+		else if (result.get(y).checkMerge()){
+			result.get(x).setHeight(val/2);
+			result.get(y).merge(result.get(x));
+			result.get(y).setHeight(val/2);
+			result.remove(x);
+		}
+		else {
+			result.get(x).clustMerge(result.get(y));
+			result.get(x).setClustHeight(val/2);
+			result.remove(y);
+		}
+		
+		System.out.println("final val = " + val);
 		System.out.println("result - " + result);
 
 	}
@@ -114,10 +148,10 @@ public class PhyloTree {
 
 	public double getMinValue(double[][] numbers) {
 		double minValue = 999;
-		System.out.println("number = ");
+		System.out.println("min value - matrix size = ");
 		System.out.println(numbers.length-1);
-		for (int j = 0; j < numbers.length-1; j++) {
-			for (int i = 0; i < numbers.length-1; i++) {
+		for (int j = 0; j < numbers.length; j++) {
+			for (int i = 0; i < numbers.length; i++) {
 				if (numbers[j][i] < minValue && numbers[j][i] > 0) {
 					minValue = numbers[j][i];
 					x = j;
@@ -133,9 +167,11 @@ public class PhyloTree {
 			System.out.println("Cluster " + i + ": ");
 			System.out.println(
 					"height = " + result.get(i).height + "\n" +
+					"clust height = " + result.get(i).clustHeight + "\n" +
 					"seq = " + result.get(i).sequence + "\n" 
 					);
-			if (result.get(i).cluster2 != null) {printTree(result.get(i).cluster2);}
+			if (result.get(i).cluster2 != null) {System.out.println("fuse " + result.get(i).cluster2.sequence);printTree(result.get(i).cluster2);}
+			if (result.get(i).cluster3 != null) {System.out.println("clust " + result.get(i).cluster3.sequence);System.out.println("clust group");printTree(result.get(i).cluster3);}
 		}
 	}
 	
@@ -143,9 +179,12 @@ public class PhyloTree {
 		System.out.println("secondary");
 		System.out.println(
 				"height = " + result.height + "\n" +
+				"clust height = " + result.clustHeight + "\n" +
 				"seq = " + result.sequence + "\n" 
 				);
-		if (result.cluster2 != null) {printTree(result.cluster2);}
+		if (result.cluster2 != null) {System.out.println("fuse " + result.cluster2.sequence);printTree(result.cluster2);}
+		if (result.cluster3 != null) {System.out.println("clust " + result.cluster3.sequence);System.out.println("clust group");printTree(result.cluster3);}
+		
 	}
 
 	public static void main(String[] args) {
