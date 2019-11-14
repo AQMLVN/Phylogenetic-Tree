@@ -64,20 +64,27 @@ public class PhyloTree {
 			double[][] newDist = new double[distMatrix.length-1][distMatrix.length-1];
 			int countx = 0;
 			int county = 0;
-			for (int i = 0; i < distMatrix.length-2; i++) {
-				for (int j = 0; j < distMatrix.length-2; j++) {
-					countx = i;
-					county = j;
+			for (int i = 1; i < distMatrix.length-1; i++, countx++) {
+				for (int j = 1; j < distMatrix.length-1; j++, county++) {
+					//countx = i;
+					//county = j;
 					if (i == j) {newDist[i][j] = 0;}
 					else {
-						if (i == x || i == y) {countx++;county++;}
-						if (j == x || j == y) {county++;countx++;}
-						newDist[countx-1][county-1] = distMatrix[countx][county];
-						if (countx >= distMatrix.length-1) {countx = 0;}
-						if (county >= distMatrix.length-1) {county = 0;}
+						if (i == 1) {countx = 0;}
+						if (j == 1) {county = 0;}
+						//if (countx >= distMatrix.length) {countx = 0;}
+						//if (county >= distMatrix.length) {county = 0;}
+						while (countx == x || countx == y) {countx++;}
+						while (county == y || county == x) {county++;}
+						
 
-						//}
-					}
+						
+						newDist[i][j] = distMatrix[countx][county];
+						newDist[j][i] = distMatrix[countx][county];
+						
+
+						}
+					
 				}
 			}
 			
@@ -104,6 +111,7 @@ public class PhyloTree {
 
 	}
 
+
 	public double getMinValue(double[][] numbers) {
 		double minValue = 999;
 		System.out.println("number = ");
@@ -118,6 +126,26 @@ public class PhyloTree {
 			}
 		}
 		return minValue ;
+	}
+	
+	public void printTree(ArrayList<Cluster> result) {
+		for (int i = 0; i < result.size(); i++) {
+			System.out.println("Cluster " + i + ": ");
+			System.out.println(
+					"height = " + result.get(i).height + "\n" +
+					"seq = " + result.get(i).sequence + "\n" 
+					);
+			if (result.get(i).cluster2 != null) {printTree(result.get(i).cluster2);}
+		}
+	}
+	
+	public void printTree(Cluster result) {
+		System.out.println("secondary");
+		System.out.println(
+				"height = " + result.height + "\n" +
+				"seq = " + result.sequence + "\n" 
+				);
+		if (result.cluster2 != null) {printTree(result.cluster2);}
 	}
 
 	public static void main(String[] args) {
@@ -141,6 +169,7 @@ public class PhyloTree {
 		tree.createDistMatrix();
 		tree.printDistMatrix();
 		tree.createTree();
+		tree.printTree(tree.result);
 	}
 
 }
