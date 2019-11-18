@@ -233,7 +233,7 @@ public class SeqAlign {
 		test.printMatrix();
 		System.out.println();
 		test.printTrace();
-//		System.out.println("hi");
+		System.out.println("hi");
 //		test.singleAlign("CGTAGCA");
 //		test.printMatrix();
 //		System.out.println();

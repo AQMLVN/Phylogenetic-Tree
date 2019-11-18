@@ -105,6 +105,9 @@ public class MultipleSeq {
 		mulTest.msAlign();
 		System.out.println(mulTest.alignedSeqs.size());
 		System.out.println(mulTest.alignedSeqs);
+		for (int i = 0; i < mulTest.alignedSeqs.size(); i++) {
+			System.out.println(mulTest.alignedSeqs.get(i));
+		}
 	}
 	
 }
