@@ -137,7 +137,6 @@ public class SeqAlign {
 		int j = seq.length()-1;
 		int k = seqB.length()-1;
 		int count = 0;
-		int gCount = 0;
 		resA = "";
 		
 		while (j >= 0 && k >= 0) {
@@ -145,13 +144,11 @@ public class SeqAlign {
 				resA = resA + "-";		
 				//resB = resB + seqB.charAt(k);
 				k--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "up--") {
 				resA = resA + seq.charAt(j);
 				//resB = resB + "-";
 				j--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "diag") {
 				//resB = resB + seqB.charAt(k);
@@ -173,13 +170,11 @@ public class SeqAlign {
 			resA = resA + seq.charAt(j);
 			//resB = resB + "-"; 
 			j--;
-			gCount++; 
 			}
 		while (k >= 0 && j < 0) {
 			//resB = resB + seqB.charAt(k); 
 			//resA = resA + "-";
 			k--;
-			gCount++; 
 			}	
 		
 		while (resA.length() < resB.length()) {

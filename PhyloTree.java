@@ -53,13 +53,25 @@ public class PhyloTree {
 			Cluster c = new Cluster(alignedSeqs.get(i));
 			result.add(c);
 		}
-		System.out.println(result);
+		for (int i = 0; i < distMatrix.length; i++) {
+			System.out.println(i);
+			System.out.println(result.get(i).sequence);
+		}
+
 		while (result.size() > 2) {
+			System.out.println("LOOP!!!");
 			double val = getMinValue(distMatrix);
-			System.out.println("val = " + val);
-			result.get(x).merge(result.get(y));
-			result.get(x).setHeight(val/2);
-			result.remove(y);
+			
+			System.out.println("get x = " + result.get(x).sequence + " " + x);
+			System.out.println("get y = " + result.get(y).sequence + " " + y);
+			
+			Cluster temp = result.get(x).merge(result.get(y), "grouping " + result.size());
+			temp.setHeight(val/2);
+			result.remove(x);
+			if (x < y) {result.remove(y-1);}
+			else {result.remove(y);}
+			result.add(temp);
+			
 			// reconstruct matrix
 			double[][] newDist = new double[distMatrix.length-1][distMatrix.length-1];
 			int countx = 0;
@@ -97,16 +109,24 @@ public class PhyloTree {
 				if (i < y) {value = (distMatrix[i][x] + distMatrix[i][y])/2;}
 				if (i >= y) {value = (distMatrix[i+1][x] + distMatrix[i+1][y])/2;}
 				if (i == x) {value = 0;}
-				System.out.println("i = " + i);
-				System.out.println("y = " + y);
-				System.out.println("x = " + x);
-				System.out.println("value = " + value);
 				newDist[x][i] = value;
 				newDist[i][x] = value;
 			}
 			distMatrix = newDist;
 			printDistMatrix();
 		}
+		//double val = getMinValue(distMatrix);
+		System.out.println("x = " + x + "and y = " + y);
+		
+		double val = getMinValue(distMatrix);
+		Cluster temp = result.get(x).merge(result.get(y), "grouping " + result.size());
+		temp.setHeight(val/2);
+		result.remove(x);
+		if (x < y) {result.remove(y-1);}
+		else {result.remove(y);}
+		result.add(temp);
+		
+		System.out.println("final val = " + val);
 		System.out.println("result - " + result);
 
 	}
@@ -114,14 +134,14 @@ public class PhyloTree {
 
 	public double getMinValue(double[][] numbers) {
 		double minValue = 999;
-		System.out.println("number = ");
+		System.out.println("min value - matrix size = ");
 		System.out.println(numbers.length-1);
-		for (int j = 0; j < numbers.length-1; j++) {
-			for (int i = 0; i < numbers.length-1; i++) {
-				if (numbers[j][i] < minValue && numbers[j][i] > 0) {
-					minValue = numbers[j][i];
-					x = j;
-					y = i;
+		for (int i = 0; i < numbers.length; i++) {
+			for (int j = 0; j < numbers.length; j++) {
+				if (numbers[i][j] < minValue && numbers[i][j] != 0) {
+					minValue = numbers[i][j];
+					x = i;
+					y = j;
 				}
 			}
 		}
@@ -133,19 +153,63 @@ public class PhyloTree {
 			System.out.println("Cluster " + i + ": ");
 			System.out.println(
 					"height = " + result.get(i).height + "\n" +
-					"seq = " + result.get(i).sequence + "\n" 
+					"seq = " + result.get(i).sequence 
 					);
-			if (result.get(i).cluster2 != null) {printTree(result.get(i).cluster2);}
+			if (result.get(i).group1 != null) {
+				System.out.println(result.get(i).group1.sequence + " belongs to " + result.get(i).sequence);
+				printTree(result.get(i).group1);
+			}
+			if (result.get(i).group2 != null) {
+				System.out.println(result.get(i).group2.sequence + " belongs to " + result.get(i).sequence);
+				printTree(result.get(i).group2);
+			}
 		}
+		
 	}
 	
 	public void printTree(Cluster result) {
 		System.out.println("secondary");
 		System.out.println(
 				"height = " + result.height + "\n" +
-				"seq = " + result.sequence + "\n" 
+				"seq = " + result.sequence 
 				);
-		if (result.cluster2 != null) {printTree(result.cluster2);}
+		if (result.group1 != null) {
+			System.out.println(result.group1.sequence + " belongs to " + result.sequence);
+			printTree(result.group1);
+		}
+		if (result.group2 != null) {
+			System.out.println(result.group2.sequence + " belongs to " + result.sequence);
+			printTree(result.group2);
+		}
+		
+	}
+	
+	public void printNewick(ArrayList<Cluster> result) {
+		for (int i = 0; i < result.size(); i++) {
+			System.out.print(result.get(i).sequence + "(");
+			if (result.get(i).group1 != null) {
+				printNewick(result.get(i).group1);
+			}
+			System.out.print(",");
+			if (result.get(i).group2 != null) {
+				printNewick(result.get(i).group2);
+			}
+			System.out.print(")");
+		}
+		
+	}
+	
+	public void printNewick(Cluster result) {
+		System.out.print(result.sequence + "(");
+		if (result.group1 != null) {
+			printNewick(result.group1);
+		}
+		System.out.print(",");
+		if (result.group2 != null) {
+			printNewick(result.group2);
+		}
+		System.out.print(")");
+		
 	}
 
 	public static void main(String[] args) {
@@ -154,6 +218,9 @@ public class PhyloTree {
 		test.add("ATCACGATGAACC");
 		test.add("ATCAGGAATGAATCC");
 		test.add("TCACGATTGAATCGC");
+		for (int i = 0; i < test.size(); i++) {
+			System.out.println(test.get(i));
+		}
 		MultipleSeq mulTest = new MultipleSeq();
 		mulTest.createSimilarityMatrix(test);
 		mulTest.alignOrder();
@@ -161,8 +228,10 @@ public class PhyloTree {
 		System.out.println("\n########################################################################\n");
 		System.out.println(mulTest.alignedSeqs.size());
 		System.out.println(mulTest.alignedSeqs);
+		System.out.println("____________________________");
 		for (int i = 0; i < mulTest.alignedSeqs.size(); i++) {
 			System.out.println(mulTest.alignedSeqs.get(i));
+			System.out.println();
 		}
 		System.out.println("\n########################################################################\n");
 		PhyloTree tree = new PhyloTree(mulTest.alignedSeqs);
@@ -170,6 +239,8 @@ public class PhyloTree {
 		tree.printDistMatrix();
 		tree.createTree();
 		tree.printTree(tree.result);
+		System.out.println("@@@@@@@@@@@@@@ FINAL RESULT @@@@@@@@@@@@@@@@");
+		tree.printNewick(tree.result);
 	}
 
 }
