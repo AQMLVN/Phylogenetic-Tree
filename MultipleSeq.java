@@ -10,6 +10,7 @@ public class MultipleSeq {
 	
 	public MultipleSeq() {}
 	
+	// Create similarity matrix for all sequences
 	public void createSimilarityMatrix(ArrayList<String> seqs) {
 		this.seqs = seqs;
 		similarityMatrix = new double[seqs.size()][seqs.size()];
@@ -18,27 +19,25 @@ public class MultipleSeq {
 				if (i != j) {
 					SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
 					sequencePair.align();
-					System.out.println("Sequence " + i + " and Sequence " + j + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
 					similarityMatrix[i][j] = sequencePair.identity;
 				}
 			}
 		}
 	}
 	
+	// Multiple Sequence Alignment
 	public void msAlign() {
 		SeqAlign sequencePair = null;
 		alignedSeqs = new ArrayList<String>(order.size());
 		for (int i = 0; i < order.size(); i++) {
 			alignedSeqs.add("");
 		}
-		System.out.println("order size: " + order.size());
 		for (int i = 0; i < order.size(); i++) {
 			if (i == 0) {
 				sequencePair = new SeqAlign(seqs.get(order.get(i)), seqs.get(order.get(i+1)));
 				sequencePair.align();
 				alignedSeqs.set(order.get(i), sequencePair.resA);
 				alignedSeqs.set(order.get(i+1), sequencePair.resB);
-				System.out.println("Sequence " + "0" + " and Sequence " + "1" + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
 				}
 			else {
 				if (i == order.size()-1) {return;}
@@ -46,10 +45,9 @@ public class MultipleSeq {
 				alignedSeqs.set(order.get(i+1), sequencePair.resA);
 			}
 		}
-		//SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
-		//maintainOrder();
 	}
 	
+	// Determines order of progressive alignment based on distance
 	public void alignOrder() {
 		int x = -1;
 		int y = -1;
@@ -68,6 +66,7 @@ public class MultipleSeq {
 		
 	}
 	
+	// Helper method for alignOrder()
 	public void alignOrder(double max) {
 		int x = -1;
 		int y = -1;
@@ -87,6 +86,7 @@ public class MultipleSeq {
 		
 	}
 	
+	// Prints similarity Matrix
 	public void printSimMatrix() {
 		DecimalFormat f = new DecimalFormat("##.00"); // round to 2 decimals
 		for (int i = 0; i < similarityMatrix.length; i++) {
@@ -94,25 +94,6 @@ public class MultipleSeq {
 		        System.out.print(f.format(similarityMatrix[i][j]) + " ");
 		    }
 		    System.out.println();
-		}
-	}
-	
-	public static void main (String[] args) {
-		ArrayList<String> test = new ArrayList<String>();
-		test.add("CATGCGAGTAGTAG");
-		test.add("CATGGTAGTAG");
-		test.add("CCTGGAGTACGTAG");
-		test.add("CATGAGCGTAG");
-		MultipleSeq mulTest = new MultipleSeq();
-		mulTest.createSimilarityMatrix(test);
-		mulTest.printSimMatrix();
-		mulTest.alignOrder();
-		System.out.println("\n" + mulTest.order);
-		mulTest.msAlign();
-		System.out.println(mulTest.alignedSeqs.size());
-		System.out.println(mulTest.alignedSeqs);
-		for (int i = 0; i < mulTest.alignedSeqs.size(); i++) {
-			System.out.println(mulTest.alignedSeqs.get(i));
 		}
 	}
 	

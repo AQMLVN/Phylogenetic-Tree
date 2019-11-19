@@ -1,10 +1,9 @@
-
-
 public class Cluster {
 	
 	String sequence;
 	Cluster group1 = null;
 	Cluster group2 = null;
+	Cluster parent = null;
 	double height = 0;
 	
 	public Cluster(String sequence) {
@@ -20,6 +19,10 @@ public class Cluster {
 		Cluster c = new Cluster(this, s1);
 		c.sequence = name;
 		return c;
+	}
+	
+	public void addParent(Cluster c) {
+		parent = c;
 	}
 	
 	public void setHeight(double height) {
