@@ -6,7 +6,7 @@ public class MultipleSeq {
 	double[][] similarityMatrix;
 	ArrayList<Integer> order = new ArrayList<Integer>();
 	ArrayList<String> seqs;
-	ArrayList<String> alignedSeqs = new ArrayList<String>();
+	ArrayList<String> alignedSeqs;
 	
 	public MultipleSeq() {}
 	
@@ -27,21 +27,27 @@ public class MultipleSeq {
 	
 	public void msAlign() {
 		SeqAlign sequencePair = null;
+		alignedSeqs = new ArrayList<String>(order.size());
+		for (int i = 0; i < order.size(); i++) {
+			alignedSeqs.add("");
+		}
+		System.out.println("order size: " + order.size());
 		for (int i = 0; i < order.size(); i++) {
 			if (i == 0) {
 				sequencePair = new SeqAlign(seqs.get(order.get(i)), seqs.get(order.get(i+1)));
 				sequencePair.align();
-				alignedSeqs.add(sequencePair.resA);
-				alignedSeqs.add(sequencePair.resB);
+				alignedSeqs.set(order.get(i), sequencePair.resA);
+				alignedSeqs.set(order.get(i+1), sequencePair.resB);
 				System.out.println("Sequence " + "0" + " and Sequence " + "1" + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
 				}
 			else {
 				if (i == order.size()-1) {return;}
 				sequencePair.singleAlign(seqs.get(order.get(i+1)));
-				alignedSeqs.add(sequencePair.resA);
+				alignedSeqs.set(order.get(i+1), sequencePair.resA);
 			}
 		}
 		//SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
+		//maintainOrder();
 	}
 	
 	public void alignOrder() {
@@ -105,6 +111,9 @@ public class MultipleSeq {
 		mulTest.msAlign();
 		System.out.println(mulTest.alignedSeqs.size());
 		System.out.println(mulTest.alignedSeqs);
+		for (int i = 0; i < mulTest.alignedSeqs.size(); i++) {
+			System.out.println(mulTest.alignedSeqs.get(i));
+		}
 	}
 	
 }
