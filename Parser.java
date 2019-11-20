@@ -10,12 +10,13 @@ public class Parser {
 	
 	public Parser() {
 		Scanner scanner = new Scanner(new InputStreamReader(System.in));
-		//System.out.println("Please enter match score (default = 5): ");
-		//match = scanner.nextInt();
-		//System.out.println("Please enter mismatch score (default = -2): ");
-		//mismatch = scanner.nextInt();
-		//System.out.println("Please enter gap score (default = -1): ");
-		//gap = scanner.nextInt();
+		System.out.println("Please enter match score (default = 5): ");
+		match = scanner.nextInt();
+		System.out.println("Please enter mismatch score (default = -2): ");
+		mismatch = scanner.nextInt();
+		System.out.println("Please enter gap score (default = -1): ");
+		gap = scanner.nextInt();
+		scanner = new Scanner(new InputStreamReader(System.in));
 		System.out.println("Please enter the input sequences: ");
 		String input = null;
 		String seq = "";

@@ -23,6 +23,13 @@ public class SeqAlign {
 		for (int j = 1; j <= seqB.length(); j++) {alignMatrix[0][j] = alignMatrix[0][j-1] + gap;}
 	}
 	
+	// Sets the config of alignment
+	public void setConfig(int match, int mismatch, int gap) {
+		this.match = match;
+		this.mismatch = mismatch;
+		this.gap = gap;
+	}
+	
 	
 	public void align() {
 		// Filling out the alignment matrix
@@ -48,20 +55,17 @@ public class SeqAlign {
 		int j = seqA.length()-1;
 		int k = seqB.length()-1;
 		int count = 0;
-		int gCount = 0;
 		
 		while (j >= 0 && k >= 0) {
 			if (traceMatrix[j][k] == "left") {
 				resA = resA + "-";		
 				resB = resB + seqB.charAt(k);
 				k--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "up--") {
 				resA = resA + seqA.charAt(j);
 				resB = resB + "-";
 				j--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "diag") {
 				resB = resB + seqB.charAt(k);
@@ -83,15 +87,11 @@ public class SeqAlign {
 			resA = resA + seqA.charAt(j);
 			resB = resB + "-"; 
 			j--;
-			gCount++; 
-			System.out.println("gap");
 			}
 		while (k >= 0 && j < 0) {
 			resB = resB + seqB.charAt(k); 
 			resA = resA + "-";
 			k--;
-			gCount++; 
-			System.out.println("gap");
 			}	
 		
 		// Flip the result
@@ -100,13 +100,9 @@ public class SeqAlign {
 		
 		identity = (double)count/resA.length();
 		
-		System.out.println(resA);
-		System.out.println(resB);
-		System.out.println("\nidentity: " + identity);
-		System.out.println("gaps: " + gCount + "\n");
-		
 	}
 	
+	// aligns a sequence to another FIXED sequence
 	public void singleAlign(String seq) {
 		seqB = resB;
 		alignMatrix = new int[seq.length()+1][seqB.length()+1];
@@ -122,7 +118,6 @@ public class SeqAlign {
 					traceMatrix[x-1][y-1] = "dia=";
 				}
 				else {
-					//int up = alignMatrix[x-1][y] - gap;
 					int left = alignMatrix[x][y-1] + gap;
 					int diag = alignMatrix[x-1][y-1] + mismatch;
 					alignMatrix[x][y] = Math.max(left, diag);
@@ -137,30 +132,23 @@ public class SeqAlign {
 		int j = seq.length()-1;
 		int k = seqB.length()-1;
 		int count = 0;
-		int gCount = 0;
 		resA = "";
 		
 		while (j >= 0 && k >= 0) {
 			if (traceMatrix[j][k] == "left") {
 				resA = resA + "-";		
-				//resB = resB + seqB.charAt(k);
 				k--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "up--") {
 				resA = resA + seq.charAt(j);
-				//resB = resB + "-";
 				j--;
-				gCount++;
 			}
 			else if (traceMatrix[j][k] == "diag") {
-				//resB = resB + seqB.charAt(k);
 				resA = resA + seq.charAt(j);
 				j--;
 				k--;
 			}
 			else if (traceMatrix[j][k] == "dia=") {
-				//resB = resB + seqB.charAt(k);
 				resA = resA + seq.charAt(j);
 				j--;
 				k--;
@@ -171,15 +159,10 @@ public class SeqAlign {
 		// If j or k == 0, add gap
 		while (j >= 0 && k < 0) {
 			resA = resA + seq.charAt(j);
-			//resB = resB + "-"; 
 			j--;
-			gCount++; 
 			}
 		while (k >= 0 && j < 0) {
-			//resB = resB + seqB.charAt(k); 
-			//resA = resA + "-";
 			k--;
-			gCount++; 
 			}	
 		
 		while (resA.length() < resB.length()) {
@@ -188,16 +171,7 @@ public class SeqAlign {
 		
 		// Flip the result
 		resA = reverse(resA);
-		//resB = reverse(resB);
-		
 		identity = (double)count/resA.length();
-		
-		System.out.println(resA);
-		//System.out.println();
-		//System.out.println(resB);
-		//System.out.println("\nidentity: " + identity);
-		//System.out.println("gaps: " + gCount + "\n");
-		
 	}
 	
 	public void printTrace() {
@@ -225,19 +199,6 @@ public class SeqAlign {
 	
 	public String reverse(String original) {
 	    return new StringBuilder(original).reverse().toString();
-	}
-	
-	public static void main (String[] args) {
-		SeqAlign test = new SeqAlign("GCATGCU", "CATAGAA");
-		test.align();
-		test.printMatrix();
-		System.out.println();
-		test.printTrace();
-//		System.out.println("hi");
-//		test.singleAlign("CGTAGCA");
-//		test.printMatrix();
-//		System.out.println();
-//		test.printTrace();
 	}
 	
 }

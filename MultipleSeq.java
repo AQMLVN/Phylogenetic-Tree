@@ -6,10 +6,14 @@ public class MultipleSeq {
 	double[][] similarityMatrix;
 	ArrayList<Integer> order = new ArrayList<Integer>();
 	ArrayList<String> seqs;
-	ArrayList<String> alignedSeqs = new ArrayList<String>();
+	ArrayList<String> alignedSeqs;
+	int match = 5;
+	int mismatch = -2;
+	int gap = -1;
 	
 	public MultipleSeq() {}
 	
+	// Create similarity matrix for all sequences
 	public void createSimilarityMatrix(ArrayList<String> seqs) {
 		this.seqs = seqs;
 		similarityMatrix = new double[seqs.size()][seqs.size()];
@@ -17,33 +21,45 @@ public class MultipleSeq {
 			for (int j = 0; j < seqs.size(); j++) {
 				if (i != j) {
 					SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
+					sequencePair.setConfig(match, mismatch, gap);
 					sequencePair.align();
-					System.out.println("Sequence " + i + " and Sequence " + j + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
 					similarityMatrix[i][j] = sequencePair.identity;
 				}
 			}
 		}
 	}
 	
+	// Sets the config of alignment
+	public void setConfig(int match, int mismatch, int gap) {
+		this.match = match;
+		this.mismatch = mismatch;
+		this.gap = gap;
+	}
+	
+	// Multiple Sequence Alignment
 	public void msAlign() {
 		SeqAlign sequencePair = null;
+		alignedSeqs = new ArrayList<String>(order.size());
+		for (int i = 0; i < order.size(); i++) {
+			alignedSeqs.add("");
+		}
 		for (int i = 0; i < order.size(); i++) {
 			if (i == 0) {
 				sequencePair = new SeqAlign(seqs.get(order.get(i)), seqs.get(order.get(i+1)));
+				sequencePair.setConfig(match, mismatch, gap);
 				sequencePair.align();
-				alignedSeqs.add(sequencePair.resA);
-				alignedSeqs.add(sequencePair.resB);
-				System.out.println("Sequence " + "0" + " and Sequence " + "1" + ": identity = " + sequencePair.identity + ", gap = " + sequencePair.gap);
+				alignedSeqs.set(order.get(i), sequencePair.resA);
+				alignedSeqs.set(order.get(i+1), sequencePair.resB);
 				}
 			else {
 				if (i == order.size()-1) {return;}
 				sequencePair.singleAlign(seqs.get(order.get(i+1)));
-				alignedSeqs.add(sequencePair.resA);
+				alignedSeqs.set(order.get(i+1), sequencePair.resA);
 			}
 		}
-		//SeqAlign sequencePair = new SeqAlign(seqs.get(i), seqs.get(j));
 	}
 	
+	// Determines order of progressive alignment based on distance
 	public void alignOrder() {
 		int x = -1;
 		int y = -1;
@@ -62,6 +78,7 @@ public class MultipleSeq {
 		
 	}
 	
+	// Helper method for alignOrder()
 	public void alignOrder(double max) {
 		int x = -1;
 		int y = -1;
@@ -81,6 +98,7 @@ public class MultipleSeq {
 		
 	}
 	
+	// Prints similarity Matrix
 	public void printSimMatrix() {
 		DecimalFormat f = new DecimalFormat("##.00"); // round to 2 decimals
 		for (int i = 0; i < similarityMatrix.length; i++) {
@@ -89,22 +107,6 @@ public class MultipleSeq {
 		    }
 		    System.out.println();
 		}
-	}
-	
-	public static void main (String[] args) {
-		ArrayList<String> test = new ArrayList<String>();
-		test.add("CATGCGAGTAGTAG");
-		test.add("CATGGTAGTAG");
-		test.add("CCTGGAGTACGTAG");
-		test.add("CATGAGCGTAG");
-		MultipleSeq mulTest = new MultipleSeq();
-		mulTest.createSimilarityMatrix(test);
-		mulTest.printSimMatrix();
-		mulTest.alignOrder();
-		System.out.println("\n" + mulTest.order);
-		mulTest.msAlign();
-		System.out.println(mulTest.alignedSeqs.size());
-		System.out.println(mulTest.alignedSeqs);
 	}
 	
 }
