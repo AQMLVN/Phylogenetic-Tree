@@ -1,7 +1,16 @@
+import java.io.IOException;
+
 public class Main {
 	public Main() {}
 	
 	public static void main(String[] args) {
+		Runtime rt = Runtime.getRuntime();
+	    try {
+			rt.exec("cmd.exe /c cd \""+"c:\\CombineImages\\"+"\" & start cmd.exe /k \"java jar PhylogeneticTree.jar\"");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Parser parse = new Parser();
 		long start = System.currentTimeMillis();
@@ -23,7 +32,7 @@ public class Main {
 			System.out.println(parse.getCharForNumber(i+1) + " ----> " + parse.nameList.get(i).substring(0, parse.nameList.get(i).length()-1));
 			System.out.println(parse.sequenceList.get(i) + "\n");
 		}
-		System.out.println("\n" + "Time Elapsed: " + ((end - start)/1000) + " seconds");
+		System.out.println("\n" + "Time Elapsed: " + (end - start) + " milliseconds");
 	}
 	
 }

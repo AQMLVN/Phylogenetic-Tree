@@ -86,13 +86,13 @@ public class PhyloTree {
 				}
 			}
 			
-			for (int i = 0; i < distMatrix.length-1; i++) {
+			for (int i = 1; i < distMatrix.length-1; i++) {
 				double value = 0;
 				if (i < y) {value = (distMatrix[i][x] + distMatrix[i][y])/2;}
 				if (i >= y) {value = (distMatrix[i+1][x] + distMatrix[i+1][y])/2;}
-				if (i == x) {value = 0;}
-				newDist[x][i] = value;
-				newDist[i][x] = value;
+				//if (i == x) {value = 0;}
+				newDist[0][i] = value;
+				newDist[i][0] = value;
 			}
 			distMatrix = newDist;
 			printDistMatrix();
