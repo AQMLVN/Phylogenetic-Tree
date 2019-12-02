@@ -34,8 +34,8 @@ public class PhyloTree {
 	}
 
 	// Computes distance between 2 sequences
-	public int computeDist(String seq1, String seq2) {
-		int count = 0;
+	public double computeDist(String seq1, String seq2) {
+		double count = 0;
 		String compare;
 		String result;
 		if (seq1.length() < seq2.length()) {compare = seq1; result = seq2;}
@@ -86,13 +86,15 @@ public class PhyloTree {
 				}
 			}
 			
-			for (int i = 0; i < distMatrix.length-1; i++) {
+			// new values
+			for (int i = 1, j = 0; i < distMatrix.length-1; i++, j++) {
 				double value = 0;
-				if (i < y) {value = (distMatrix[i][x] + distMatrix[i][y])/2;}
-				if (i >= y) {value = (distMatrix[i+1][x] + distMatrix[i+1][y])/2;}
-				if (i == x) {value = 0;}
-				newDist[x][i] = value;
-				newDist[i][x] = value;
+				//value = (distMatrix[i][x] + distMatrix[i][y])/2;
+				//if (x == 0 || y == 0) {j++;}
+				while (j == x || j == y) {j++;}
+				value = (distMatrix[j][x] + distMatrix[j][y])/2;
+				newDist[0][i] = value;
+				newDist[i][0] = value;
 			}
 			distMatrix = newDist;
 			printDistMatrix();
@@ -207,31 +209,6 @@ public class PhyloTree {
 	
 	private String getCharForNumber(int i) {
 	    return i > 0 && i < 27 ? String.valueOf((char)(i + 'A' - 1)) : "";
-	}
-
-	public static void main(String[] args) {
-		ArrayList<String> test = new ArrayList<String>();
-		test.add("AAAGTTAATGAGTGGTTATCCAGAAGTAGTGACATTTTAGCCTCTGATAACTCCAACGGTAGGAGCCATGAGCAGAGCGCAGAGGTGCCTAGTGCCTTAGAAGATGGGCATCCAGATACCGCAGAGGGAAATTCTAGCGTTTCTGAGAAGACTGAC");
-		test.add("AAAGTTAATGAGTGGTTATTCAGAAGTAATGACGTTTTAGCCCCAGATTACTCAAGTGTTAGGAGCCATGAACAGAATGCAGAGGCAACCAATGCTTTAGAATATGGGCATGTAGAGACAGATGGAAATTCTAGCATTTCTGAAAAGACTGAT");
-		test.add("AAAGTTAACGAGTGGTTTTCCAGAGGTGATGACATATTAACTTCTGATGACTCACACGATAGGGGGTCTGAATTAAATGCAGAAGTAGCTGGTGCATTGAAAGTTTCAAAAGAAGTAGATGAATATTCTAGTTTTTCAGAGAAGATAGAC");
-		test.add("AAAGTTAATGAGTGGTTTTCCAGAAGTGATGACATACTAACTTCTGATGACTCACACAATGGGGGGTCTGAATCAAATGCAGAAGTAGTTGGTGCATTGAAAGTTCCAAATGAAGTAGATGGATATTCTGGTTCTTCAGAGAAGATAGAC");
-		test.add("AAAGTTAATGAGTGGTTTTTCAGAAGTGATGGCCTGGATGACTTGCATGATAAGGGGTCTGAGTCAAATGCAGAAGTAGCTGGTGCTTTAGAAGTTCCAGAAGAAGTACATGGATATTCTAGTTCTTCAGAGAAAATAGAC");
-		test.add("AAAGTTAATGAGTGGTTTTCTAGAAGCGATGAAATGTTAACTTCTGACGACTCACAGGACAGGAGGTCTGAATCAAATACTGGGGTAGCTGGTGCAGCAGAGGTTCCAAATGAAGCAGATGGACATTTGGGTTCTTCAGAGAAAATAGAC");
-		test.add("AAAGTGAATGAATGGCTTTCCAGAAGTGATGAACTGTTAACTTCTGATGACTCATATGATAAGGGATCTAAATCAAAAACTGAAGTAACTGTAACAACAGAAGTTCCAAATGCAATAGATAGRTTTTTTGGTTCTTCAGAGAAAATAAAC");
-		test.add("AAAGTTAATGAGTGGTTTTCCAGAAGTGATGAACTGTTAGGTTCTGATGACTCACATGATGGGGAGTCTGAATCAAATGCCAAAGTAGCTGATGTATTGGACGTTCTAAATGAGGTAGATGAATATTCTGGTTCTTCAGAGAAAATAGAC");
-		test.add("AAAGTGAATGAGTGGTTTTCCAGAACTGGTGAAATGTTAACTTCTGACAATGCATCTGACAGGAGGCCTGCGTCAAATGCAGAAGCTGCTGTTGTGTTAGAAGTTTCAAATGAAGTGGATGGATGTTTCAGTTCTTCAAAGAAAATAGAC");
-		
-		MultipleSeq mulTest = new MultipleSeq();
-		mulTest.createSimilarityMatrix(test);
-		mulTest.alignOrder();
-		mulTest.msAlign();
-		PhyloTree tree = new PhyloTree(mulTest.alignedSeqs);
-		tree.createDistMatrix();
-		tree.printDistMatrix();
-		tree.createTree();
-		//tree.printTree(tree.result);
-		System.out.println("@@@@@@@@@@@@@@ FINAL RESULT @@@@@@@@@@@@@@@@");
-		tree.printNewick(tree.result);
 	}
 
 }

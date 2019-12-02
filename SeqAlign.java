@@ -168,7 +168,6 @@ public class SeqAlign {
 		while (resA.length() < resB.length()) {
 			resA = resA + "-";
 		}
-		
 		// Flip the result
 		resA = reverse(resA);
 		identity = (double)count/resA.length();
